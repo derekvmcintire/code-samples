@@ -2,7 +2,7 @@
 
 **Author**: Derek McIntire  
 **Date**: November 2024  
-**Project Repository**: [GitHub - simple-fetch-ts](https://github.com/derekvmcintire/simple-fetch-ts)  
+**Project Repository**: [derekvmcintire/simple-fetch-ts](https://github.com/derekvmcintire/simple-fetch-ts)  
 **NPM Package**: [simple-fetch-ts on NPM](https://www.npmjs.com/package/simple-fetch-ts)
 
 ---
