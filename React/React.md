@@ -99,7 +99,6 @@ import React from "react";
 import { Container } from "@mantine/core";
 import { useQuery } from "@tanstack/react-query";
 import { fetchRaces } from "@/src/_api/get/races/fetch-races";
-import { GetRacesResponse } from "@/src/_api/get/races/fetch-races-response-type";
 import { useUploaderContext } from "@/src/_contexts/Uploader/UploaderContext";
 import useDebounce from "@/src/_hooks/use-debounce";
 import { getFormattedYearString, yearTrunc } from "@/src/_utility/date-helpers";
@@ -193,6 +192,115 @@ export default function RaceSearch({ setError }: RaceSearchProps) {
 - **React Query** for fetching and caching race data.
 - **Debounced input** to optimize API calls.
 - **Custom error handling** that integrates with the parent component’s state.
+
+---
+
+### 3. **Uploader Context**
+
+The Uploader Context provides a centralized state management system for handling the process of uploading and managing race-related data.
+
+```typescript
+"use client";
+
+import React, {
+  createContext,
+  ReactNode,
+  useContext,
+  useState,
+  useMemo,
+} from "react";
+import { GetCategoriesResponse } from "@/src/_api/get/categories/fetch-categories-response-type";
+import { IGetRacesResponse } from "../../_api/types";
+
+export interface IUploaderContext {
+  selectedRace?: IGetRacesResponse | undefined; // Explicit type for race
+  setSelectedRace: (selectedRace: IGetRacesResponse | undefined) => void;
+  categoryOptions: GetCategoriesResponse[];
+  setCategoryOptions: (categoryOptions: GetCategoriesResponse[]) => void;
+  isLoading: boolean;
+  setIsLoading: (isLoading: boolean) => void;
+  errors: string[];
+  setErrors: (errors: string[]) => void;
+  successMessage: string;
+  setSuccessMessage: (successMessage: string) => void;
+}
+
+export const defaultUploaderContextValue: IUploaderContext = {
+  selectedRace: undefined,
+  setSelectedRace: () => {},
+  categoryOptions: [],
+  setCategoryOptions: () => {},
+  isLoading: false,
+  setIsLoading: () => {},
+  errors: [],
+  setErrors: () => {},
+  successMessage: "",
+  setSuccessMessage: () => {},
+};
+
+const UploaderContext = createContext<IUploaderContext>(
+  defaultUploaderContextValue
+);
+
+interface UploaderContextProviderProps {
+  children: ReactNode;
+  initialValue?: IUploaderContext;
+}
+
+export const UploaderContextProvider: React.FC<
+  UploaderContextProviderProps
+> = ({ children, initialValue = defaultUploaderContextValue }) => {
+  const [selectedRace, setSelectedRace] = useState<
+    IGetRacesResponse | undefined
+  >(initialValue.selectedRace);
+  const [categoryOptions, setCategoryOptions] = useState<
+    GetCategoriesResponse[]
+  >(initialValue.categoryOptions);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [errors, setErrors] = useState<string[]>(initialValue.errors);
+  const [successMessage, setSuccessMessage] = useState<string>(
+    initialValue.successMessage
+  );
+
+  const contextValue = useMemo(
+    () => ({
+      selectedRace,
+      setSelectedRace,
+      categoryOptions,
+      setCategoryOptions,
+      isLoading,
+      setIsLoading,
+      errors,
+      setErrors,
+      successMessage,
+      setSuccessMessage,
+    }),
+    [selectedRace, categoryOptions, isLoading, errors, successMessage]
+  );
+
+  return (
+    <UploaderContext.Provider value={contextValue}>
+      {children}
+    </UploaderContext.Provider>
+  );
+};
+
+export const useUploaderContext = (): IUploaderContext => {
+  const context = useContext(UploaderContext);
+  if (!context) {
+    throw new Error(
+      "useUploaderContext must be used within an UploaderContextProvider"
+    );
+  }
+  return context;
+};
+```
+
+#### Key Features:
+
+- **Centralized State Management** for race selection, category options, loading states, and errors in a user-friendly and type-safe manner.
+- **UploaderContextProvider** wraps components that need access to these states.
+- **useUploaderContext** custom hook for providing access to the UploaderContext.
 
 ---
 
