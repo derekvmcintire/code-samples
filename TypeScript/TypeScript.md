@@ -9,32 +9,76 @@
 
 ## Overview
 
-The `SimpleBuilder` class is a TypeScript utility for creating and executing HTTP requests using a builder-pattern-based API. This class simplifies HTTP requests by providing a fluent interface for chaining configuration methods, such as setting request bodies, headers, and query parameters, and supports common HTTP methods like GET, POST, PUT, PATCH, and DELETE.
+The `simple-fetch-ts` package provides a fluent, builder-pattern-based interface for making HTTP requests. This TypeScript utility simplifies the process of creating and sending requests, with built-in error handling, customizable headers, query parameters, and request bodies. The library supports the following HTTP methods:
 
-The main goal of this utility is to provide an abstraction layer that allows developers to write HTTP requests more intuitively and maintainable.
+- **GET**: For retrieving data.
+- **POST**: For submitting data.
+- **PUT**: For updating data.
+- **PATCH**: For partially updating data.
+- **DELETE**: For deleting data.
+
+The primary goal of this package is to provide a lightweight, intuitive abstraction for working with HTTP requests, while maintaining flexibility and type safety, making it easier for developers to build and manage network interactions in TypeScript.
 
 ### Key Features:
 
-- Fluent interface using method chaining.
-- Supports HTTP methods: GET, POST, PUT, PATCH, and DELETE.
-- Allows configuration of headers, request body, and query parameters.
-- Ensures that methods like GET do not accidentally include a request body.
-- Includes error handling for invalid method-body combinations.
+- **Fluent Interface**: Chain configuration methods for headers, body, and query parameters.
+- **Type Safety**: Built-in TypeScript support for strongly-typed request bodies and responses.
+- **Automatic Error Handling**: Catches common HTTP errors and method-body mismatches.
+- **Customizable Query Parameters**: Allows serialization and validation of query parameters.
 
 ---
 
 ## Code
 
+### **`simple` Factory Function**
+
+This factory function simplifies the creation of a `SimpleBuilder` instance with URL validation and optional custom logging.
+
+```typescript
+import { SimpleBuilder } from "../builder";
+import { InvalidURLError } from "../errors/url-validation-error";
+import { SimpleLogger } from "../types";
+import { isValidURL } from "../utility/url-helpers";
+
+/**
+ * Factory function to create an instance of SimpleBuilder.
+ *
+ * This function validates the provided URL and throws an error if it's invalid.
+ * It then returns a new instance of SimpleBuilder, optionally with a custom logger.
+ *
+ * @param {string} url - The base URL for the HTTP requests.
+ * @param {SimpleLogger} [logger=console.error] - Optional custom logger function for logging errors.
+ * @returns {SimpleBuilder} A new instance of SimpleBuilder.
+ * @throws {InvalidURLError} If the provided URL is invalid.
+ */
+export const simple = (url: string, logger?: SimpleLogger): SimpleBuilder => {
+  if (!isValidURL(url)) {
+    throw new InvalidURLError(url);
+  }
+
+  return new SimpleBuilder({ url, logger });
+};
+```
+
+---
+
 ### **`SimpleBuilder` Class**
+
+The `SimpleBuilder` class is the core component for configuring and sending HTTP requests. It provides methods for setting the request body, headers, and query parameters, while also ensuring proper error handling and validation of the request configuration.
+
+- The **`SimpleBuilder`** class supports all major HTTP methods and includes built-in error handling for invalid combinations of HTTP methods and request bodies.
+- Query parameters are automatically serialized into the URL using the `serializeQueryParams` helper.
+- The **`Content-Type`** header is automatically set to `application/json` if a request body is provided for methods like POST, PUT, or PATCH.
 
 ```typescript
 import { InvalidMethodBodyError } from "../errors/request-body-error";
+import { SimpleFetchRequestError } from "../errors/request-error";
 import { tsDelete } from "../methods/delete";
 import { tsFetch } from "../methods/fetch";
 import { tsPatch } from "../methods/patch";
 import { tsPost } from "../methods/post";
 import { tsPut } from "../methods/put";
-import { QueryParams, SimpleResponse } from "../types";
+import { QueryParams, SimpleLogger, SimpleResponse } from "../types";
 import { serializeQueryParams } from "../utility/url-helpers";
 
 /**
@@ -47,15 +91,21 @@ export class SimpleBuilder {
   private requestBody: unknown = null;
   private requestHeaders: HeadersInit = {};
   private requestParams: string = "";
+  private logger: SimpleLogger;
 
   /**
    * Constructs a SimpleBuilder instance with a base URL and optional default headers.
-   * @param url - The base URL for the request.
+   * @param options - The options for configuring the SimpleBuilder instance.
    * @param defaultHeaders - Default headers to include in every request.
    */
-  constructor(url: string, defaultHeaders: HeadersInit = {}) {
+  constructor({
+    url,
+    logger = console.error,
+    defaultHeaders = {},
+  }: SimpleBuilderOptions) {
     this.url = url;
     this.requestHeaders = defaultHeaders;
+    this.logger = logger;
   }
 
   /**
@@ -99,30 +149,6 @@ export class SimpleBuilder {
   }
 
   /**
-   * Checks if the given headers object is a plain record of key-value pairs.
-   * @param headers - The headers object to validate.
-   * @returns True if the headers object is a plain record, false otherwise.
-   */
-  private isHeadersRecord(
-    headers: HeadersInit
-  ): headers is Record<string, string> {
-    return typeof headers === "object" && !(headers instanceof Headers);
-  }
-
-  /**
-   * Ensures that the Content-Type header is set to 'application/json' if a request body exists.
-   */
-  private prepareHeaders(): void {
-    if (
-      this.isHeadersRecord(this.requestHeaders) &&
-      !this.requestHeaders["Content-Type"] &&
-      this.requestBody
-    ) {
-      this.requestHeaders["Content-Type"] = "application/json";
-    }
-  }
-
-  /**
    * Executes the provided request function and handles errors.
    * Validates that the request body is only used with applicable HTTP methods.
    * @param requestFn - The function to execute the HTTP request.
@@ -134,11 +160,15 @@ export class SimpleBuilder {
     requestFn: () => Promise<SimpleResponse<T>>,
     method: "GET" | "POST" | "PUT" | "PATCH" | "DELETE"
   ): Promise<SimpleResponse<T>> {
+    const { logger, url } = this;
+
     if (
       !["POST", "PUT", "PATCH", "DELETE"].includes(method) &&
       this.requestBody !== null
     ) {
-      throw new InvalidMethodBodyError(method, this.url);
+      const error = new InvalidMethodBodyError(method, url);
+      logger(error.message, error);
+      throw error;
     }
 
     this.prepareHeaders();
@@ -146,7 +176,17 @@ export class SimpleBuilder {
     try {
       return await requestFn();
     } catch (error) {
-      console.error(`Error with ${method} request to ${this.url}:`, error); // @TODO allow logger configuration
+      if (error instanceof SimpleFetchRequestError) {
+        logger(
+          `Error with ${method} request to ${url}: Status ${error.status} - ${error.statusText}`,
+          error
+        );
+      } else if (error instanceof Error) {
+        logger(`Error with ${method} request to ${url}:`, error);
+      } else {
+        const unknownError = new Error("Unknown error type encountered.");
+        logger(`Error with ${method} request to ${url}:`, unknownError);
+      }
       throw error;
     }
   }
@@ -216,10 +256,62 @@ export class SimpleBuilder {
 
 ---
 
-## Additional Notes
+### **`tsPost` Method**
 
-- The **`SimpleBuilder`** class supports all major HTTP methods and includes built-in error handling for invalid combinations of HTTP methods and request bodies.
-- Query parameters are automatically serialized into the URL using the `serializeQueryParams` helper.
-- The **`Content-Type`** header is automatically set to `application/json` if a request body is provided for methods like POST, PUT, or PATCH.
+The tsPost function implements the actual POST request by serializing the request body if needed and returning a type-safe response.
 
----
+```typescript
+import { SimpleFetchRequestError } from "../../errors/request-error";
+import { SimpleResponse } from "../../types";
+import { getContentType } from "../../utility/get-content-type";
+
+/**
+ * Performs a typed POST request to the specified URL.
+ *
+ * If the `Content-Type` is set to `application/json` and the body is an object, the body
+ * is automatically stringified to JSON format.
+ *
+ * @template T - The type of the expected response data.
+ * @param url - The URL to send the request to.
+ * @param requestBody - The data to be sent as the request body.
+ * @param requestHeaders - Optional headers to include with the request.
+ * @returns A promise that resolves with a SimpleResponse object.
+ * @throws Will throw an error if the fetch fails or the response status is not OK.
+ */
+export const tsPost = async <T>(
+  url: string,
+  requestBody: any,
+  requestHeaders: HeadersInit = {}
+): Promise<SimpleResponse<T>> => {
+  const contentType = getContentType(requestHeaders).toLowerCase();
+
+  // Automatically stringify the body if Content-Type is JSON and body is an object
+  const body =
+    contentType === "application/json" && typeof requestBody === "object"
+      ? JSON.stringify(requestBody)
+      : requestBody;
+
+  try {
+    const response = await fetch(url, {
+      method: "POST",
+      headers: {
+        "Content-Type": contentType,
+        ...requestHeaders,
+      },
+      body,
+    });
+
+    if (!response.ok) {
+      throw new SimpleFetchRequestError(response);
+    }
+
+    return {
+      status: response.status,
+      statusText: response.statusText,
+      data: await response.json(),
+    };
+  } catch (error) {
+    throw new SimpleFetchRequestError(error);
+  }
+};
+```
