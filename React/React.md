@@ -2,26 +2,25 @@
 
 **Author**: Derek McIntire  
 **Date**: November 2024  
-**Project Repository**: [GitHub - acs-next](https://github.com/derekvmcintire/acs-next)
+**Project Repository**: [derekvmcintire/acs-next](https://github.com/derekvmcintire/acs-next)
 
 ---
 
 ## Overview
 
-This code sample demonstrates the implementation of two React components:
+This code sample demonstrates the implementation of two React components and one React context:
 
 1. **`SearchAutoComplete`**: A reusable search input component powered by Mantine’s `Autocomplete` and React icons.
 2. **`RaceSearch`**: A component that integrates `SearchAutoComplete` to search for races, utilizing React Query to fetch race data and manage state with debounce functionality.
+3. **`Uploader Context`**: A centralized state management system for handling race uploads, including race selection, category options, loading states, errors, and success messages, ensuring consistent and type-safe functionality across components.
 
-These components showcase my ability to work with modern React patterns, TypeScript, and the Mantine component library, as well as best practices for clean, maintainable code.
-
----
+These components are part of my Amateur Cycling Stats (ACS) project. Specifically, they form the search functionality on the Upload page, where users can upload race results to a new or existing race via a comma-separated or tab-separated file or text input. They showcase my proficiency with modern React patterns, TypeScript, the React Query library, the Mantine component library, and best practices for clean, maintainable code.
 
 ## Code
 
 ### 1. **`SearchAutoComplete` Component**
 
-This is a simple, reusable autocomplete component that allows users to search for a race. It supports customization for placeholder text, search result limits, and event handling.
+This is a reusable autocomplete component that allows users to search for a race. It supports customization for placeholder text, search result limits, and event handling.
 
 ```typescript
 "use client";
@@ -49,33 +48,31 @@ interface SearchAutoCompleteProps {
   onOptionSubmit: (value: string) => void;
 }
 
-const SearchAutoComplete: React.FC<SearchAutoCompleteProps> = React.memo(
-  function SearchAutoComplete({
-    leftSectionPointerEvents = "none",
-    placeholder = "Search",
-    data,
-    limit,
-    value,
-    onChange,
-    onOptionSubmit,
-  }: SearchAutoCompleteProps) {
-    return (
-      <Autocomplete
-        classNames={{
-          input: classes.searchAutocomplete,
-        }}
-        leftSectionPointerEvents={leftSectionPointerEvents}
-        leftSection={icon}
-        placeholder={placeholder}
-        data={data}
-        limit={limit}
-        value={value}
-        onChange={onChange}
-        onOptionSubmit={onOptionSubmit}
-      />
-    );
-  }
-);
+const SearchAutoComplete = React.memo(function SearchAutoComplete({
+  leftSectionPointerEvents = "none",
+  placeholder = "Search",
+  data,
+  limit,
+  value,
+  onChange,
+  onOptionSubmit,
+}: SearchAutoCompleteProps): JSX.Element {
+  return (
+    <Autocomplete
+      classNames={{
+        input: classes.searchAutocomplete,
+      }}
+      leftSectionPointerEvents={leftSectionPointerEvents}
+      leftSection={icon}
+      placeholder={placeholder}
+      data={data}
+      limit={limit}
+      value={value}
+      onChange={onChange}
+      onOptionSubmit={onOptionSubmit}
+    />
+  );
+});
 
 export default SearchAutoComplete;
 ```
@@ -247,9 +244,10 @@ interface UploaderContextProviderProps {
   initialValue?: IUploaderContext;
 }
 
-export const UploaderContextProvider: React.FC<
-  UploaderContextProviderProps
-> = ({ children, initialValue = defaultUploaderContextValue }) => {
+export const UploaderContextProvider = ({
+  children,
+  initialValue = defaultUploaderContextValue,
+}: UploaderContextProviderProps): JSX.Element => {
   const [selectedRace, setSelectedRace] = useState<
     IGetRacesResponse | undefined
   >(initialValue.selectedRace);
@@ -304,10 +302,12 @@ export const useUploaderContext = (): IUploaderContext => {
 
 ---
 
-## Additional Notes
+#### Additional Notes
 
-- **Mantine UI**: This project utilizes Mantine, a modern React UI library that provides accessible and customizable components like the `Autocomplete` used in this example.
-- **React Query**: Used for data fetching and caching, ensuring that requests are efficient and responses are properly cached.
-- **Debounce Hook**: Custom hook to delay the search input and optimize API calls, preventing unnecessary requests while typing.
+- **Mantine UI**: The project leverages Mantine’s modern and accessible components, such as the `Autocomplete`, for a customizable and user-friendly search experience. Mantine’s flexibility and ease of styling simplify UI development.
+- **React Query**: This library is used for efficient data fetching and caching in the `RaceSearch` component. It ensures state management for API responses is optimized, with stale-time settings and error handling to provide a seamless user experience.
+- **Debounce Hook**: A custom debounce hook delays user input processing, minimizing redundant API calls during fast typing. This reduces server load and enhances performance.
+- **TypeScript Benefits**: Using TypeScript ensures robust type checking and clear interfaces for props and context values, leading to safer and more maintainable code.
+- **Scalability**: The components and context are designed with scalability in mind, allowing for future extensions, such as additional search filters or new data upload flows.
 
 ---
