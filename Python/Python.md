@@ -1,8 +1,12 @@
----
+# Python Code Sample
+
+**Author**: Derek McIntire  
+**Date**: January 2022  
+**Project Repository**: [derekvmcintire/veganuary](https://github.com/derekvmcintire/veganuary)
+
 ## Overview
 
 This codebase demonstrates a system for interacting with ZwiftPower APIs, processing race results, and managing general classifications (GC) for cycling competitions. It covers making HTTP requests, handling CSV data, formatting race times, and maintaining configuration constants for race categories and prime results.
----
 
 ## Key Concepts
 
