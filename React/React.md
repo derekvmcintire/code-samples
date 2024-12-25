@@ -16,6 +16,8 @@ This code sample demonstrates the implementation of two React components and one
 
 These components are part of my Amateur Cycling Stats (ACS) project. Specifically, they form the search functionality on the Upload page, where users can upload race results to a new or existing race via a comma-separated or tab-separated file or text input. They showcase my proficiency with modern React patterns, TypeScript, the React Query library, the Mantine component library, and best practices for clean, maintainable code.
 
+---
+
 ## Code
 
 ### 1. **`SearchAutoComplete` Component**
