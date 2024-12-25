@@ -12,16 +12,16 @@ This codebase demonstrates a system for interacting with ZwiftPower APIs, proces
 
 - **Modular Design**: Separation of concerns across multiple files and utilities.
 - **API Integration**: Using HTTP requests to interact with ZwiftPower endpoints.
-- **Data Processing**: Managing race results, GC rankings, and prime results.
+- **Data Processing**: Managing race results, GC rankings, and prime results with Panda.
 - **Type Safety**: Using Pydantic models to validate API response structures.
-- **File Operations**: Reading and writing structured data to CSV files.
+- **File Operations**: Reading and writing structured data to CSV files with pathlib and csv.
 - **Time Handling**: Formatting and manipulating race times.
 
 ---
 
 ## Code
 
-### ZPRequests
+### **`ZPRequests` Class**
 
 A class that handles interaction with ZwiftPower APIs. It provides methods for loading race results and prime (sprint/KOM) results for a given event. It uses an injected `HttpClient` for making HTTP requests and integrates with Pydantic models for type validation of API responses.
 
@@ -47,7 +47,7 @@ class ZPRequests:
 
 ---
 
-### HTTPClient
+### **`HttpClient` Class**
 
 A utility class for performing HTTP requests. It provides methods for making `GET` and `OPTIONS` requests and handles response parsing, error reporting, and custom headers to mimic a browser client.
 
@@ -94,7 +94,7 @@ class HttpClient:
 
 ---
 
-### models
+### **Domain Models**
 
 Contains Pydantic models used to validate and structure API responses. These models represent individual rider results, event results, and prime (sprint/KOM) results in a type-safe way.
 
@@ -122,7 +122,7 @@ class PrimeResults(BaseModel):
 
 ---
 
-### OverallStandingsModel
+### **`OverallStandingsModel` Class**
 
 A class responsible for calculating and ranking General Classification (GC) results across multiple stages of a cycling competition. It processes stage results from CSV files, calculates cumulative GC times, ranks riders, and saves results back to CSV. It also handles sprint and KOM (King of the Mountain) results for additional classifications.
 
@@ -215,7 +215,7 @@ class OverallStandingsModel:
 
 ---
 
-### CSV Utils
+### **CSV Utility Functions**
 
 Provides utility functions for reading and writing structured data in CSV format. These utilities streamline file operations for managing race results and rankings.
 
@@ -245,7 +245,7 @@ def write_dicts_to_csv(file_path: str, data: List[Dict[str, str]]) -> None:
 
 ---
 
-### Time Util
+### **Time Utility FUnction**
 
 A utility function to format race times (in seconds) into a human-readable `hh:mm:ss` format. This is used for display purposes in the processed GC results.
 
@@ -259,18 +259,59 @@ def format_race_time(race_time: float) -> str:
 
 ---
 
-### Config Constants
+### **Config Constants**
 
 Defines constants for race categories (`A`, `B`, `C`, `D`), sprint/KOM types, and prime result IDs for different stages. These constants standardize configuration across the codebase and ensure consistency.
 
 ```python
-CATEGORY_SHAPE = {"A": [], "B": [], "C": [], "D": []}
-CATEGORIES = ["A", "B", "C", "D"]
 KOM_TYPE = "kom"
 SPRINT_TYPE = "sprint"
-PRIME_IDS = {
-    "1": {"kom": ["1", "2"], "sprint": ["3", "4"]},
-    # Add additional stage primes here
-}
 
+CATEGORIES = ['a', 'b', 'c', 'd']
+CATEGORY_SHAPE = {
+    "a": [],
+    "b": [],
+    "c": [],
+    "d": []
+}
+PRIME_CATEGORY_SHAPE = {
+    "a": {},
+    "b": {},
+    "c": {},
+    "d": {}
+}
+WINNING_TIMES_SHAPE = {
+    "a": 0,
+    "b": 0,
+    "c": 0,
+    "d": 0
+}
+PRIME_CATEGORY_SHAPE = {
+    "a": {},
+    "b": {},
+    "c": {},
+    "d": {}
+}
+SINGLE_POINTS = [12, 10, 8, 7, 6, 5, 4, 3, 2, 1]
+DOUBLE_POINTS = [20, 15, 10, 8, 6, 5, 4, 3, 2, 1]
+SPRINT_TYPE = 1
+KOM_TYPE = 2
+PRIME_IDS = {
+    '1': {
+        KOM_TYPE: ['48'],
+        SPRINT_TYPE: []
+    },
+    '2': {
+        KOM_TYPE: ['54'],
+        SPRINT_TYPE: ['59', '61', '62']
+    },
+    '3': {
+        KOM_TYPE: ['20'],
+        SPRINT_TYPE: ['21']
+    },
+    '4': {
+        KOM_TYPE: ['2', '17'],
+        SPRINT_TYPE: ['3']
+    }
+}
 ```
