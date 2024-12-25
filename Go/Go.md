@@ -8,7 +8,7 @@
 
 ## Overview
 
-This Go application implements a receipt processing system where each receipt is evaluated, processed, and associated with a set of reward points. The system is built using the **Clean Architecture** approach, promoting separation of concerns and ensuring that different components (such as core logic, HTTP handling, and storage) are independently modifiable and testable.
+This Go application implements a receipt processing system where each receipt is processed, and associated with a set of reward points. The system is built using a **Clean Architecture** approach, promoting separation of concerns and ensuring that different components (core logic, HTTP handling, and storage) are independently modifiable and testable.
 
 Key features and architectural decisions:
 
