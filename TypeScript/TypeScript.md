@@ -60,6 +60,25 @@ export const simple = (url: string, logger?: SimpleLogger): SimpleBuilder => {
 };
 ```
 
+Usage:
+```typescript
+import { simple } from "simple-fetch-ts";
+
+const myFilters = { page: 1, limit: 10, orderBy: "id" };
+const params = myFilters as QueryParams; // QueryParams type validates params i.e. no nested objects
+const convertToLowerCase = true;
+
+const response = await simple("https://api.example.com/resource")
+  .headers({ Authorization: "Bearer token" })
+  .params(params, convertToLowerCase)
+  .body<BodyType>({ name: "example" })
+  .post<ExpectedReturnType>();
+
+const myData = response.data;
+
+console.log(myData);
+```
+
 ---
 
 ### **`SimpleBuilder` Class**
