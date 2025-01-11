@@ -311,3 +311,70 @@ export const useUploaderContext = (): IUploaderContext => {
 - **Scalability**: The components and context are designed with scalability in mind, allowing for future extensions, such as additional search filters or new data upload flows.
 
 ---
+
+### Documentation with Descriptions Filled In
+
+---
+
+## Overview
+
+This codebase demonstrates a system for interacting with ZwiftPower APIs, processing race results, and managing general classifications (GC) for cycling competitions. It covers making HTTP requests, handling CSV data, formatting race times, and maintaining configuration constants for race categories and prime results.
+
+---
+
+## Key Concepts
+
+- **Modular Design**: Separation of concerns across multiple files and utilities.
+- **API Integration**: Using HTTP requests to interact with ZwiftPower endpoints.
+- **Data Processing**: Managing race results, GC rankings, and prime results.
+- **Type Safety**: Using Pydantic models to validate API response structures.
+- **File Operations**: Reading and writing structured data to CSV files.
+- **Time Handling**: Formatting and manipulating race times.
+
+---
+
+## Code
+
+### ZPRequests
+
+A class that handles interaction with ZwiftPower APIs. It provides methods for loading race results and prime (sprint/KOM) results for a given event. It uses an injected `HttpClient` for making HTTP requests and integrates with Pydantic models for type validation of API responses.
+
+---
+
+### HTTPClient
+
+A utility class for performing HTTP requests. It provides methods for making `GET` and `OPTIONS` requests and handles response parsing, error reporting, and custom headers to mimic a browser client.
+
+---
+
+### models
+
+Contains Pydantic models used to validate and structure API responses. These models represent individual rider results, event results, and prime (sprint/KOM) results in a type-safe way.
+
+---
+
+### OverallStandingsModel
+
+A class responsible for calculating and ranking General Classification (GC) results across multiple stages of a cycling competition. It processes stage results from CSV files, calculates cumulative GC times, ranks riders, and saves results back to CSV. It also handles sprint and KOM (King of the Mountain) results for additional classifications.
+
+---
+
+### CSV Utils
+
+Provides utility functions for reading and writing structured data in CSV format. These utilities streamline file operations for managing race results and rankings.
+
+---
+
+### Time Util
+
+A utility function to format race times (in seconds) into a human-readable `hh:mm:ss` format. This is used for display purposes in the processed GC results.
+
+---
+
+### Config Constants
+
+Defines constants for race categories (`A`, `B`, `C`, `D`), sprint/KOM types, and prime result IDs for different stages. These constants standardize configuration across the codebase and ensure consistency.
+
+---
+
+Let me know if you’d like more detail or further refinements!
