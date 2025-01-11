@@ -1,4 +1,4 @@
-# TypeScript Code Sample
+# Unit Test Code Sample
 
 **Author**: Derek McIntire  
 **Date**: November 2024  
@@ -8,7 +8,7 @@
 
 ## Overview
 
-This code sample demonstrates the testing of a ReceiptService in a TypeScript-based application. The ReceiptService is responsible for processing receipts and calculating reward points based on various rules such as retailer name, purchase total, and item details. It also retrieves the points associated with saved receipts. The tests ensure that the service correctly handles receipt validation, points calculation, and error scenarios, such as when invalid data is provided or when a receipt cannot be found.
+This code sample demonstrates the testing of a ReceiptService in a TypeScript. The ReceiptService is responsible for processing receipts and calculating reward points based on various rules such as retailer name, purchase total, and item details. It also retrieves the points associated with saved receipts. The tests ensure that the service correctly handles receipt validation, points calculation, and error scenarios, such as when invalid data is provided or when a receipt cannot be found.
 
 The testing suite uses Jest as the testing framework, and mocks are used to simulate the repository and points calculator dependencies, allowing for focused unit tests. This approach ensures that each unit of the service logic is tested in isolation.
 
