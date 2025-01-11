@@ -6,7 +6,7 @@
 
 ## Introduction
 
-I am an experienced Full Stack Developer with over six years of expertise in building and scaling web applications using technologies like TypeScript, React, Node.js, and Python. My technical skills include designing high-performance APIs, creating responsive user interfaces, and developing scalable, maintainable back-end systems. Passionate about clean architecture, performance optimization, and testable software, I thrive in agile, fast-paced environments and have a proven track record of leading technical decisions and mentoring team members.
+I am an experienced Full Stack Developer with over six years of expertise in building and scaling web applications using technologies like TypeScript, React, Node.js, and Python. My technical skills include designing high-performance APIs, creating responsive user interfaces, and developing scalable, maintainable back-end systems. I am passionate about clean architecture, performance optimization, and testable software, I thrive in agile, fast-paced environments and have a proven track record of leading technical decisions and mentoring team members.
 
 I am motivated by opportunities to use technology as a tool for creating meaningful change, whether by improving accessibility, driving equity, or solving complex challenges. With a deep commitment to building reliable and impactful software, I am eager to contribute my skills to organizations dedicated to making a positive difference in their communities or industries.
 
