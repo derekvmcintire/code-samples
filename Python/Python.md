@@ -12,7 +12,7 @@ This codebase demonstrates a system for interacting with ZwiftPower APIs, proces
 
 - **Modular Design**: Separation of concerns across multiple files and utilities.
 - **API Integration**: Using HTTP requests to interact with ZwiftPower endpoints.
-- **Data Processing**: Managing race results, GC rankings, and prime results with Panda.
+- **Data Processing**: Managing race results, GC rankings, and prime results with Pandas.
 - **Type Safety**: Using Pydantic models to validate API response structures.
 - **File Operations**: Reading and writing structured data to CSV files with pathlib and csv.
 - **Time Handling**: Formatting and manipulating race times.
@@ -26,9 +26,8 @@ This codebase demonstrates a system for interacting with ZwiftPower APIs, proces
 A class that handles interaction with ZwiftPower APIs. It provides methods for loading race results and prime (sprint/KOM) results for a given event. It uses an injected `HttpClient` for making HTTP requests and integrates with Pydantic models for type validation of API responses.
 
 ```python
-from typing import Any, Dict, List, Optional
 from utils.http_client import HttpClient
-from api.models import EventResults, PrimeResults
+from api.models import EventResults
 
 
 class ZPRequests:
